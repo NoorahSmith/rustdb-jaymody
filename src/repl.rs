@@ -42,10 +42,10 @@ where
         // process statement
         if input.starts_with("insert") {
             match Row::from_str(input.strip_prefix("insert").unwrap()) {
-                Ok(row) => {
-                    table.insert_row(row).unwrap();
-                    writeln!(writer, "Executed.").unwrap();
-                }
+                Ok(row) => match table.insert_row(row) {
+                    Ok(_) => writeln!(writer, "Executed.").unwrap(),
+                    Err(msg) => writeln!(writer, "{}", msg).unwrap(),
+                },
                 Err(error) => {
                     writeln!(writer, "Failed to parse insert statement: {}", error).unwrap();
                 }
@@ -63,7 +63,16 @@ where
 mod tests {
     use std::vec;
 
+    use crate::db::TABLE_MAX_ROWS;
+
     use super::*;
+
+    fn string_to_str<'a>(pairs: &'a Vec<(String, String)>) -> Vec<(&'a str, &'a str)> {
+        pairs
+            .into_iter()
+            .map(|x| (x.0.as_str(), x.1.as_str()))
+            .collect()
+    }
 
     fn run_lines(input_lines: &Vec<String>) -> Vec<String> {
         let input = input_lines.join("\n");
@@ -107,5 +116,22 @@ mod tests {
             ("select", "(1, user1, person1@example.com)\n\nExecuted."),
             (".exit", ""),
         ]);
+    }
+
+    #[test]
+    fn print_error_when_table_is_full() {
+        let pairs: Vec<(String, String)> = (0..TABLE_MAX_ROWS)
+            .map(|i| {
+                (
+                    format!("insert {} user{} person{}@example.com", i, i, i),
+                    "Executed.".to_owned(),
+                )
+            })
+            .collect();
+        let mut pairs = string_to_str(&pairs);
+        pairs.push(("insert 1000000 apple banana", "Table full."));
+        pairs.push((".exit", ""));
+
+        check_input_output_pairs(pairs);
     }
 }
