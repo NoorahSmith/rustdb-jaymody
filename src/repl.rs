@@ -63,7 +63,7 @@ where
 mod tests {
     use std::vec;
 
-    use crate::db::TABLE_MAX_ROWS;
+    use crate::db::{COLUMN_EMAIL_SIZE, COLUMN_USERNAME_SIZE, TABLE_MAX_ROWS};
 
     use super::*;
 
@@ -133,5 +133,19 @@ mod tests {
         pairs.push((".exit", ""));
 
         check_input_output_pairs(pairs);
+    }
+
+    #[test]
+    fn allow_string_at_max_length() {
+        let long_username = "a".repeat(COLUMN_USERNAME_SIZE);
+        let long_email = "b".repeat(COLUMN_EMAIL_SIZE);
+        let row_str = format!("insert 1 {} {}", long_username, long_email);
+        let expected_output = format!("(1, {}, {})\n\nExecuted.", long_username, long_email);
+
+        check_input_output_pairs(vec![
+            (row_str.as_str(), "Executed."),
+            ("select", expected_output.as_str()),
+            (".exit", ""),
+        ]);
     }
 }

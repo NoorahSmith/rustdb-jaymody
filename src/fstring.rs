@@ -13,7 +13,7 @@ impl<const SIZE: usize> std::str::FromStr for FString<{ SIZE }> {
         if !s.is_ascii() {
             return Err("String contains non-ascii characters.".to_owned());
         }
-        if s.len() >= SIZE {
+        if s.len() > SIZE {
             return Err(format!(
                 "String len {} exceeds max length {}",
                 s.len(),
