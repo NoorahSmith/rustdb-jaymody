@@ -46,8 +46,8 @@ where
                     Ok(_) => writeln!(writer, "Executed.").unwrap(),
                     Err(msg) => writeln!(writer, "{}", msg).unwrap(),
                 },
-                Err(error) => {
-                    writeln!(writer, "Failed to parse insert statement: {}", error).unwrap();
+                Err(msg) => {
+                    writeln!(writer, "{}", msg).unwrap();
                 }
             }
         } else if input.starts_with("select") {
@@ -145,6 +145,22 @@ mod tests {
         check_input_output_pairs(vec![
             (row_str.as_str(), "Executed."),
             ("select", expected_output.as_str()),
+            (".exit", ""),
+        ]);
+    }
+
+    #[test]
+    fn disallow_string_over_max_length() {
+        let long_username = "a".repeat(COLUMN_USERNAME_SIZE + 1);
+        let row_str = format!("insert 1 {} banana", long_username);
+        let expected_output = format!(
+            "String len {} exceeds max length {}",
+            COLUMN_USERNAME_SIZE + 1,
+            COLUMN_USERNAME_SIZE
+        );
+
+        check_input_output_pairs(vec![
+            (row_str.as_str(), expected_output.as_str()),
             (".exit", ""),
         ]);
     }
