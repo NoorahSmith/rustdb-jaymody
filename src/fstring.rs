@@ -32,6 +32,6 @@ impl<const SIZE: usize> std::str::FromStr for FString<{ SIZE }> {
 
 impl<const SIZE: usize> std::fmt::Display for FString<{ SIZE }> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        unsafe { write!(f, "{}", std::str::from_utf8_unchecked(&self.arr)) }
+        write!(f, "{}", std::str::from_utf8(&self.arr).unwrap())
     }
 }
