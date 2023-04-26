@@ -25,8 +25,7 @@ impl Pager {
     pub fn get_page_by_page_num(&mut self, page_num: usize) -> Result<&mut Page, String> {
         if page_num > TABLE_MAX_PAGES {
             return Err(format!(
-                "Tried to fetch page number out of bounds: {} > {}",
-                page_num, TABLE_MAX_PAGES
+                "Tried to fetch page number out of bounds: {page_num} > {TABLE_MAX_PAGES}",
             ));
         }
 

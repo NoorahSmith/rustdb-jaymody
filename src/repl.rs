@@ -82,7 +82,7 @@ mod tests {
         start(&input[..], &mut output);
 
         let output_str = String::from_utf8(output).unwrap();
-        let mut output_lines: Vec<&str> = output_str.split(&format!("{}", PROMPT)).collect();
+        let mut output_lines: Vec<&str> = output_str.split(&format!("{PROMPT}")).collect();
 
         // get rid of anything that gets printed before first prompt is printed
         // then check that there is exactly 1 output line per input line
@@ -123,7 +123,7 @@ mod tests {
         let pairs: Vec<(String, String)> = (0..TABLE_MAX_ROWS)
             .map(|i| {
                 (
-                    format!("insert {} user{} person{}@example.com", i, i, i),
+                    format!("insert {i} user{i} person{i}@example.com"),
                     "Executed.".to_owned(),
                 )
             })
@@ -139,8 +139,8 @@ mod tests {
     fn allow_string_at_max_length() {
         let long_username = "a".repeat(COLUMN_USERNAME_SIZE);
         let long_email = "b".repeat(COLUMN_EMAIL_SIZE);
-        let row_str = format!("insert 1 {} {}", long_username, long_email);
-        let expected_output = format!("(1, {}, {})\n\nExecuted.", long_username, long_email);
+        let row_str = format!("insert 1 {long_username} {long_email}");
+        let expected_output = format!("(1, {long_username}, {long_email})\n\nExecuted.");
 
         check_input_output_pairs(vec![
             (row_str.as_str(), "Executed."),
@@ -152,7 +152,7 @@ mod tests {
     #[test]
     fn disallow_string_over_max_length() {
         let long_username = "a".repeat(COLUMN_USERNAME_SIZE + 1);
-        let row_str = format!("insert 1 {} banana", long_username);
+        let row_str = format!("insert 1 {long_username} banana");
         let expected_output = format!(
             "String len {} exceeds max length {}",
             COLUMN_USERNAME_SIZE + 1,
